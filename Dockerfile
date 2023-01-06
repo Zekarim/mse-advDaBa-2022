@@ -1,5 +1,4 @@
-FROM maven:latest
-COPY src/ src
-COPY pom.xml .
-RUN mvn compile
-CMD ["mvn", "exec:java"]
+FROM python:latest
+RUN pip install neo4j
+COPY tp2.py ./
+CMD ["python", "-u", "tp2.py"]

@@ -1,3 +1,4 @@
+# TP2 AdvDB, Brede Swann, Zerika Karim
 ##  Approach for loading the graph
 
 To load the graph in the Neo4j container, an app container is created to process everything.

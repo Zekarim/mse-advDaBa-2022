@@ -19,7 +19,7 @@ class Example(object):
         jsonPath = os.getenv("JSON_FILE")
         print("Path to JSON file is " + jsonPath)
         # get the maximum value of two variables
-        nbArticles = int(min(int(os.getenv("MAX_NODES")), 50))
+        nbArticles = int(max(int(os.getenv("MAX_NODES")), 1000))
         print("Number of articles to consider is " + str(nbArticles))
         neo4jIP = os.getenv("NEO4J_IP")
         print("IP addresss of neo4j server is " + neo4jIP)
@@ -78,11 +78,9 @@ class Example(object):
                 for reference in item['references']:
                     # create a relationship between the article and the reference
                     with driver.session() as session:
-                        result = session.run(
-                            "MATCH (a:Article {_id: $id}),(b:Article {_id: $citationid}) CREATE (a)-[:CITES]->(b)", id=item['_id'], citationid=reference)
-                        statement = result.transaction.statement
-                        print(statement.text)
-
+                        query = "MATCH (a:Article {_id: $id}),(b:Article {_id: $citationid}) MERGE (a)-[:CITES]->(b)"
+                        params = { "id": item['_id'], 'citationid': reference }
+                        session.run(query, params)
             i += 1
 
         elapsedTime = time.time() - start_time

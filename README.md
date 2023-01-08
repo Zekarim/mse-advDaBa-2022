@@ -20,7 +20,7 @@ Create the driver with the Neo4j library with the right authentification and url
 
 In a while loop, push one item at a time creating the Article node, Author node and their relationship AUTHORED.
 
-When everything is created, another while loop tries to create the CITES relationship between articles.
+When everything is created, another while loop create the CITES relationship between articles.
 
 ## Parameter values
 
@@ -30,4 +30,4 @@ When everything is created, another while loop tries to create the CITES relatio
 
 ## Result of a performance test.
 
-{“number_of_articles”= 20000 , “memoryMB”=”3000”, “seconds”=” 207.44303917884827 ”}
+{“number_of_articles”= 10000 , “memoryMB”=”3000”, “seconds”=” 753.1971309185028 ”}

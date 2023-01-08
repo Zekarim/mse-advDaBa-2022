@@ -58,7 +58,7 @@ class Example(object):
             # Create a node for the article
             with driver.session() as session:
                 session.run(
-                    "CREATE (a:Article {_id: $id, title: $title})", id=item['_id'], title=item.get('title', ''))
+                    "MERGE (a:Article {_id: $id, title: $title})", id=item['_id'], title=item.get('title', ''))
             # Create a node for each article that has author and a relationship between the author and the article
             if 'authors' in item:
                 for author in item['authors']:
@@ -66,7 +66,12 @@ class Example(object):
                     if 'name' in author and '_id' in author:
                         with driver.session() as session:
                             session.run(
-                                "MATCH (n:Article {_id: $article_id}) CREATE (a:Author {_id: $id, name: $name})-[:AUTHORED]->(n)", id=author['_id'], name=author['name'], article_id=item['_id'])
+                        "MATCH (n:Article {_id: $article_id})"
+                        "MERGE (a:Author {_id: $id, name: $name})"
+                        "MERGE (a)-[:AUTHORED]->(n)",
+                        id=author['_id'],
+                        name=author['name'],
+                        article_id=item['_id'])
             i += 1
 
         i = 0
@@ -78,9 +83,13 @@ class Example(object):
                 for reference in item['references']:
                     # create a relationship between the article and the reference
                     with driver.session() as session:
-                        query = "MATCH (a:Article {_id: $id}),(b:Article {_id: $citationid}) MERGE (a)-[:CITES]->(b)"
-                        params = { "id": item['_id'], 'citationid': reference }
-                        session.run(query, params)
+                        for item in data:
+                            if 'references' in item:
+                                query = """
+                                    MATCH (a:Article {_id: $id}) FOREACH (citationid in $citationids |MERGE (a)-[:CITES]->(:Article {_id: citationid}))
+                                """
+                                params = { "id": item['_id'], 'citationids': item['references'] }
+                                session.run(query, params)
             i += 1
 
         elapsedTime = time.time() - start_time

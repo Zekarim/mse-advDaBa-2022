@@ -73,7 +73,7 @@ class Example(object):
                         name=author['name'],
                         article_id=item['_id'])
             i += 1
-
+        print(i)
         i = 0
         session.close()
 

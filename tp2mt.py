@@ -14,7 +14,7 @@ class Example(object):
     start_time = time.time()
 
     def process_data(self, data):
-        
+
         nbArticles = int(max(int(os.getenv("MAX_NODES")), 1000))
         neo4jIP = os.getenv("NEO4J_IP")
         uri = "bolt://" + neo4jIP + ":7687"
@@ -27,7 +27,8 @@ class Example(object):
             # Create a node for the article
             with driver.session() as session:
                 session.run(
-                    "MERGE (a:Article {_id: $id, title: $title})", id=item['_id'], title=item.get('title', ''))
+                    "MERGE (a:Article {_id: $id})" + "ON CREATE SET a.title = $title " +
+                    "ON MATCH SET a.title = $title", id=item['_id'], title=item.get('title', ''))
             # Create a node for each article that has author and a relationship between the author and the article
             if 'authors' in item:
                 for author in item['authors']:
@@ -35,30 +36,33 @@ class Example(object):
                     if 'name' in author and '_id' in author:
                         with driver.session() as session:
                             session.run(
-                        "MATCH (n:Article {_id: $article_id})"
-                        "MERGE (a:Author {_id: $id, name: $name})"
-                        "MERGE (a)-[:AUTHORED]->(n)",
-                        id=author['_id'],
-                        name=author['name'],
-                        article_id=item['_id'])
+                                "CREATE (b:Author {_id: $id, name: $name}) " +
+                                "WITH b " +
+                                "MATCH (a:Article) WHERE a._id = $article_id " +
+                                "CREATE (b)-[r:AUTHORED]->(a)",
+                                id=author['_id'],
+                                name=author['name'],
+                                article_id=item['_id'])
             i += 1
 
         session.close()
 
         i = 0
 
-        while i < nbArticles:
+        while i < len(data):
             item = data[i]
             if 'references' in item:
                 for reference in item['references']:
                     # create a relationship between the article and the reference
                     with driver.session() as session:
-                        for item in data:
-                            if 'references' in item:
                                 query = """
-                                    MATCH (a:Article {_id: $id}) FOREACH (citationid in $citationids |MERGE (a)-[:CITES]->(:Article {_id: citationid}))
+                                    MATCH (a:Article)
+                                    WHERE a._id = $id
+                                    MATCH (b:Article {_id: $reference})
+                                    CREATE (a)-[r:CITES]->(b)
                                 """
-                                params = { "id": item['_id'], 'citationids': item['references'] }
+                                params = {
+                                    "id": item['_id'], 'citationids': item['references'], 'reference': reference}
                                 session.run(query, params)
             i += 1
 
@@ -109,16 +113,22 @@ class Example(object):
 
         # Create two threads to process the data in parallel
         ex = Example()
-        thread1 = threading.Thread(target=ex.process_data, args=(data[:quart],))
-        thread2 = threading.Thread(target=ex.process_data, args=(data[quart:quart*2],))
-        thread3 = threading.Thread(target=ex.process_data, args=(data[quart*2:quart*3],))
-        thread4 = threading.Thread(target=ex.process_data, args=(data[quart*3:quart*4],))
-        thread5 = threading.Thread(target=ex.process_data, args=(data[quart*4:quart*5],))
-        thread6 = threading.Thread(target=ex.process_data, args=(data[quart*5:quart*6],))
-        thread7 = threading.Thread(target=ex.process_data, args=(data[quart*6:quart*7],))
-        thread8 = threading.Thread(target=ex.process_data, args=(data[quart*7:],))
-
-        
+        thread1 = threading.Thread(
+            target=ex.process_data, args=(data[:quart],))
+        thread2 = threading.Thread(
+            target=ex.process_data, args=(data[quart:quart*2],))
+        thread3 = threading.Thread(
+            target=ex.process_data, args=(data[quart*2:quart*3],))
+        thread4 = threading.Thread(
+            target=ex.process_data, args=(data[quart*3:quart*4],))
+        thread5 = threading.Thread(
+            target=ex.process_data, args=(data[quart*4:quart*5],))
+        thread6 = threading.Thread(
+            target=ex.process_data, args=(data[quart*5:quart*6],))
+        thread7 = threading.Thread(
+            target=ex.process_data, args=(data[quart*6:quart*7],))
+        thread8 = threading.Thread(
+            target=ex.process_data, args=(data[quart*7:],))
 
         # Start the threads
         thread1.start()
@@ -139,12 +149,12 @@ class Example(object):
         thread6.join()
         thread7.join()
         thread8.join()
-        
+
         elapsedTime = time.time() - start_time
 
         print('{“number_of_articles”=', nbArticles,
               ', “memoryMB”=”3000”, “seconds”=”', elapsedTime, '”}')
-        
+
 
 if __name__ == '__main__':
     print(sys.argv)

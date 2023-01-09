@@ -1,4 +1,4 @@
 FROM python:latest
 RUN pip install neo4j
-COPY tp2.py ./
-CMD ["python", "-u", "tp2.py"]
+COPY tp2mt.py ./
+CMD ["python", "-u", "tp2mt.py"]

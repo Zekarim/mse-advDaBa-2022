@@ -29,6 +29,8 @@ When everything is created and the threads have finish with "process_data". Anot
     - JSON_FILE=/file.json
     - MAX_NODES=100000
     - Memory = 4 gb
+    
+ Loading a 100'000 nodes article can be long, If you want to change this, the parameters are declared in the docker-compose.yaml file.
 
 
 ## Results of a performance test.

@@ -27,7 +27,7 @@ When everything is created and the threads have finish with "process_data". Anot
 ## Parameter values
 
     - JSON_FILE=/file.json
-    - MAX_NODES=10000
+    - MAX_NODES=100000
     - Memory = 4 gb
 
 

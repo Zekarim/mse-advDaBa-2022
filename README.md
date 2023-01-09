@@ -5,11 +5,7 @@ To load the graph in the Neo4j container, an app container is created to process
 
 In this container, the volume is created with the "dblpv13.json" datas.
 
-In "Dockerfile", it is declared that python is used, a library "Neo4j" is added and the file "tp2.py" is copied to the container.
-
-We have done two differents python file. One with a multi-threads method and one without multi-thread in order to compare the performance.
-
-Initially, the "build.sh" will run the code without the multi-thread. If you want to run the code with the multi-thread, in "DockerFile" change the name "tp2.py" by "tp2mt.py".
+In "Dockerfile", it is declared that python is used, a library "Neo4j" is added and the file "tp2mt.py" is copied to the container.
 
 The Username and the password are: neo4j/test. They are also written in "docker-compose.yaml".
 
@@ -17,6 +13,7 @@ Reading the whole file containing the datas is not possible since it is too big.
     - Count each line that starts with '},' to know how many items are processed.
     - Use a RegEx 'NumberInt\((\d+)\)' to correct the syntax of the json file.
     - If the count of the number of item is equal to the number of articles defined in the docker-compose file, break the loop.
+    - In order to run the code faster, we have implemented a multi-thread method.
 
 The printed file in json respect the syntax and can now be read by the library "json" of python.
 
@@ -35,9 +32,16 @@ When everything is created, another while loop create the CITES relationship bet
 
 ## Result of a performance test.
 
-Without multi-thread:
-{“number_of_articles”= 10000 , “memoryMB”=”3000”, “seconds”=” 753.1971309185028 ”}
+10'000 nodes:
+{“number_of_articles”= 10000 , “memoryMB”=”3000”, “seconds”=” 39.28367018699646 ”}
 
-With multi-thread:
-{“number_of_articles”= 10000 , “memoryMB”=”3000”, “seconds”=” 252.9682822227478 ”}
+20'000 nodes:
+{“number_of_articles”= 20000 , “memoryMB”=”3000”, “seconds”=” 173.77102184295654 ”}
+
+50'000 nodes:
+
+
+100'000 nodes:
+
+
 

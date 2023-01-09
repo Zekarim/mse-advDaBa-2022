@@ -3,7 +3,7 @@
 
 To load the graph in the Neo4j container, an app container is created to process everything.
 
-In this container, the volume is created with the "dblpv13.json" datas.
+In this container, the volume is created with the "dblpv13.json" datas that is not present in the repository. You will have to add it.
 
 In "Dockerfile", it is declared that python is used, a library "Neo4j" is added and the file "tp2mt.py" is copied to the container.
 

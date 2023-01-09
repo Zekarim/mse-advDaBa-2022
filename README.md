@@ -39,6 +39,7 @@ When everything is created, another while loop create the CITES relationship bet
 {“number_of_articles”= 20000 , “memoryMB”=”3000”, “seconds”=” 173.77102184295654 ”}
 
 50'000 nodes:
+{“number_of_articles”= 50000 , “memoryMB”=”3000”, “seconds”=” 2091.981254339218 ”}
 
 
 100'000 nodes:

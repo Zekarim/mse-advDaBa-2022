@@ -42,8 +42,8 @@ When everything is created and the threads have finish with "process_data". Anot
 50'000 nodes:
 {“number_of_articles”= 50000 , “memoryMB”=”3000”, “seconds”=” 2091.981254339218 ”}
 
-
 100'000 nodes:
+{“number_of_articles”= 100000 , “memoryMB”=”3000”, “seconds”=” 9983.238472938538 ”}
 
 
 
